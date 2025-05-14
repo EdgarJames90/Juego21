@@ -34,7 +34,7 @@ const crearCartas = () => {
 };
 
 const valorCarta = (carta, puntajeActual) => {
-  const valor = carta.slice(0, -1); // Quita la última letra (figura)
+  const valor = carta.slice(0, -1);
 
   if (['J', 'Q', 'K'].includes(valor)) return 10;
   if (valor === 'A') return (puntajeActual + 11 > 21) ? 1 : 11;
@@ -100,7 +100,7 @@ const turnoPC = () => {
 
   setTimeout(() => {
     determinarGanador();
-  }, 500); // Espera para que se vean las cartas de la PC
+  }, 500);
 };
 
 const determinarGanador = () => {
