@@ -1,12 +1,135 @@
 import './style.css'
-import _ from 'underscore';let cartas=[];let cartasJugador=[];let cartasPC=[];let puntajeJugador=0;let puntajePC=0;const boton_juego=document.getElementById("boton_juegoNuevo");const boton_pedir=document.getElementById("boton_Pedir");const boton_parar=document.getElementById("boton_parar");const jugador_div=document.getElementById("Jugador_Div");const pc_div=document.getElementById("PC_Div");const puntuacionJugador=document.getElementById("puntuacion-jugador");const puntuacionPC=document.getElementById("puntuacion-pc");boton_pedir.disabled=!0;boton_parar.disabled=!0;const crearCartas=()=>{let figuras=['C','D','H','S'];let numeros=['2','3','4','5','6','7','8','9','10','A','J','K','Q'];let cartas=[];for(let i=0;i<figuras.length;i++){for(let j=0;j<numeros.length;j++){cartas.push(`${numeros[j]}${figuras[i]}`)}}
-cartas=_.shuffle(cartas);console.log(cartas);return cartas}
-const juegoNuevo=()=>{cartasJugador.map(carta=>{const elementoCarta=document.getElementById(carta);elementoCarta.remove()});cartasPC.map(carta=>{const elementoCarta=document.getElementById(carta);elementoCarta.remove()});cartas=crearCartas();cartasJugador=[];cartasPC=[];puntajeJugador=0;puntajePC=0;boton_juego.disabled=!0;boton_pedir.disabled=!1;boton_parar.disabled=!1;puntuacionJugador.textContent=`Puntaje: ${puntajeJugador}`;puntuacionPC.textContent=`Puntaje: ${puntajePC}`}
-const pedirCarta=()=>{let carta=cartas.pop();let puntaje=0;cartasJugador.push(carta);const imagenCarta=document.createElement("img");imagenCarta.setAttribute('class','carta');imagenCarta.setAttribute('id',carta);imagenCarta.src=`assets/cartas/${carta}.png`;jugador_div.appendChild(imagenCarta);console.log(carta);if(carta[0]=='J'||carta[0]=='K'||carta[0]=='Q'||carta[0]=='1'){puntaje=10}else{if(carta[0]=='A'){if((puntajeJugador+11)>21)puntaje=1;else puntaje=11}else{puntaje=parseInt(carta[0])}}
-puntajeJugador=puntajeJugador+puntaje;puntuacionJugador.textContent=`Puntaje: ${puntajeJugador}`;if(puntajeJugador>21){boton_juego.disabled=!1;boton_pedir.disabled=!0;boton_parar.disabled=!0;alert("Perdiste")}
-console.log(cartas);console.log(puntajeJugador)}
-const pararTurno=()=>{while(puntajePC<17){let cartaPC=cartas.pop();cartasPC.push(cartaPC);const imagenCartaPC=document.createElement("img");imagenCartaPC.setAttribute('class','carta');imagenCartaPC.setAttribute('id',cartaPC);imagenCartaPC.src=`assets/cartas/${cartaPC}.png`;pc_div.appendChild(imagenCartaPC);console.log(cartaPC);let puntaje=0;if(cartaPC[0]=='J'||cartaPC[0]=='K'||cartaPC[0]=='Q'||cartaPC[0]=='1'){puntaje=10}else{if(cartaPC[0]=='A'){if((puntajePC+11)>21)puntaje=1;else puntaje=11}else{puntaje=parseInt(cartaPC[0])}}
-puntajePC=puntajePC+puntaje;console.log(puntajePC)}
-puntuacionPC.textContent=`Puntaje: ${puntajePC}`;if(puntajePC>21){alert("¡La PC se pasó de 21! ¡Ganaste!")}else if(puntajeJugador>puntajePC){alert("¡Ganaste!")}else if(puntajeJugador<puntajePC){alert("La PC ganó.")}else{alert("Empate.")}
-boton_juego.disabled=!1;boton_pedir.disabled=!0;boton_parar.disabled=!0}
-boton_juego.addEventListener("click",juegoNuevo);boton_pedir.addEventListener("click",pedirCarta);boton_parar.addEventListener("click",pararTurno)
+import _ from 'underscore';
+
+let cartas = [];
+let cartasJugador = [];
+let cartasPC = [];
+let puntajeJugador = 0;
+let puntajePC = 0;
+
+const boton_juego = document.getElementById("boton_juegoNuevo");
+const boton_pedir = document.getElementById("boton_Pedir");
+const boton_parar = document.getElementById("boton_parar");
+
+const jugador_div = document.getElementById("Jugador_Div");
+const pc_div = document.getElementById("PC_Div");
+const puntajeJugador_span = document.getElementById("puntajeJugador");
+const puntajePC_span = document.getElementById("puntajePC");
+
+boton_pedir.disabled = true;
+boton_parar.disabled = true;
+
+const crearCartas = () => {
+  let figuras = ['C', 'D', 'H', 'S'];
+  let numeros = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'A', 'J', 'K', 'Q'];
+  let cartas = [];
+
+  for (let f of figuras) {
+    for (let n of numeros) {
+      cartas.push(`${n}${f}`);
+    }
+  }
+
+  return _.shuffle(cartas);
+};
+
+const valorCarta = (carta, puntajeActual) => {
+  const valor = carta.slice(0, -1); // Quita la última letra (figura)
+
+  if (['J', 'Q', 'K'].includes(valor)) return 10;
+  if (valor === 'A') return (puntajeActual + 11 > 21) ? 1 : 11;
+  return parseInt(valor);
+};
+
+const crearImagenCarta = (carta, destino) => {
+  const imagenCarta = document.createElement("img");
+  imagenCarta.setAttribute('class', 'carta');
+  imagenCarta.setAttribute('id', carta);
+  imagenCarta.src = `assets/cartas/${carta}.png`;
+  destino.appendChild(imagenCarta);
+};
+
+const juegoNuevo = () => {
+  cartasJugador.forEach(carta => {
+    const el = document.getElementById(carta);
+    if (el) el.remove();
+  });
+  cartasPC.forEach(carta => {
+    const el = document.getElementById(carta);
+    if (el) el.remove();
+  });
+
+  cartas = crearCartas();
+  cartasJugador = [];
+  cartasPC = [];
+  puntajeJugador = 0;
+  puntajePC = 0;
+
+  puntajeJugador_span.textContent = '0';
+  puntajePC_span.textContent = '0';
+
+  boton_juego.disabled = true;
+  boton_pedir.disabled = false;
+  boton_parar.disabled = false;
+};
+
+const pedirCarta = () => {
+  const carta = cartas.pop();
+  cartasJugador.push(carta);
+
+  const valor = valorCarta(carta, puntajeJugador);
+  puntajeJugador += valor;
+  puntajeJugador_span.textContent = puntajeJugador;
+
+  crearImagenCarta(carta, jugador_div);
+
+  if (puntajeJugador > 21) {
+    finDelTurno();
+  }
+};
+
+const turnoPC = () => {
+  while (puntajePC < puntajeJugador && puntajeJugador <= 21) {
+    const carta = cartas.pop();
+    cartasPC.push(carta);
+    const valor = valorCarta(carta, puntajePC);
+    puntajePC += valor;
+    crearImagenCarta(carta, pc_div);
+    puntajePC_span.textContent = puntajePC;
+  }
+
+  setTimeout(() => {
+    determinarGanador();
+  }, 500); // Espera para que se vean las cartas de la PC
+};
+
+const determinarGanador = () => {
+  let mensaje = '';
+
+  if (puntajeJugador > 21) {
+    mensaje = '¡Perdiste! Tu puntaje superó 21.';
+  } else if (puntajePC > 21) {
+    mensaje = '¡Ganaste! La PC se pasó de 21.';
+  } else if (puntajeJugador > puntajePC) {
+    mensaje = '¡Ganaste! Tienes más puntos.';
+  } else if (puntajeJugador < puntajePC) {
+    mensaje = '¡Perdiste! La PC tiene más puntos.';
+  } else {
+    mensaje = '¡Empate!';
+  }
+
+  alert(mensaje);
+  boton_juego.disabled = false;
+  boton_pedir.disabled = true;
+  boton_parar.disabled = true;
+};
+
+const finDelTurno = () => {
+  boton_pedir.disabled = true;
+  boton_parar.disabled = true;
+  turnoPC();
+};
+
+boton_juego.addEventListener("click", juegoNuevo);
+boton_pedir.addEventListener("click", pedirCarta);
+boton_parar.addEventListener("click", finDelTurno);
